@@ -1,6 +1,6 @@
-class WelcomeScene extends Phaser.Scene {
+class BootScene extends Phaser.Scene {
   constructor() {
-    super('WelcomeScene');
+    super('BootScene');
   }
 
   preload() {
@@ -12,9 +12,30 @@ class WelcomeScene extends Phaser.Scene {
   create() {
     const { width, height } = this.scale;
 
-    // Play background music
-    this.bgMusic = this.sound.add('bg-music', { loop: true, volume: 0.5 });
-    this.bgMusic.play();
+    // Show simple start screen
+    this.add.image(width / 2, height / 2, 'welcome-bg').setDisplaySize(width, height);
+
+    this.add.text(width / 2, height * 0.5, 'Tap to Start', {
+      font: '48px Arial',
+      fill: '#ffffff'
+    }).setOrigin(0.5);
+
+    // Wait for user interaction
+    this.input.once('pointerdown', () => {
+      this.scene.start('WelcomeScene');
+    });
+  }
+}
+
+
+
+class WelcomeScene extends Phaser.Scene {
+  constructor() {
+    super('WelcomeScene');
+  }
+
+  create() {
+    const { width, height } = this.scale;
 
     // Add background scaled to fill screen
     this.add.image(width / 2, height / 2, 'welcome-bg')
@@ -39,9 +60,8 @@ class WelcomeScene extends Phaser.Scene {
     */
 
     // Play background music
-    /*this.bgMusic = this.sound.add('bg-music', { loop: true, volume: 0.5 });
+    this.bgMusic = this.sound.add('bg-music', { loop: true, volume: 0.5 });
     this.bgMusic.play();
-    */
 
     // Automatically go to GameScene after 5 seconds
     this.time.delayedCall(180000, () => {
@@ -82,7 +102,7 @@ const config = {
     mode: Phaser.Scale.FIT,     // or RESIZE
     autoCenter: Phaser.Scale.CENTER_BOTH
   },
-  scene: [WelcomeScene, GameScene],
+  scene: [BootScene, WelcomeScene, GameScene],
   audio: {
     disableWebAudio: false
   }

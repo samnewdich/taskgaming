@@ -1,4 +1,6 @@
-let gamerEmail;
+let gamerEmail  = localStorage.getItem('gem') || '';;
+let currentScene = localStorage.getItem('csKey') || '';
+let config;
 
 class BootScene extends Phaser.Scene {
   constructor() {
@@ -14,6 +16,8 @@ class BootScene extends Phaser.Scene {
   create() {
     const { width, height } = this.scale;
 
+    localStorage.setItem('csKey', 'GameScene1');
+
     // Show simple start screen
     //this.add.image(width / 2, height / 2, 'welcome-bg').setDisplaySize(width, height);
 
@@ -21,6 +25,8 @@ class BootScene extends Phaser.Scene {
       font: '48px Arial',
       fill: '#ffffff'
     }).setOrigin(0.5);
+
+
 
     // Wait for user interaction
     this.input.once('pointerdown', () => {
@@ -61,15 +67,19 @@ class WelcomeScene extends Phaser.Scene {
     }).setOrigin(0.5);
     */
 
+    localStorage.setItem('csKey', 'GameScene1');
+
     // Play background music
     this.bgMusic = this.sound.add('bg-music', { loop: true, volume: 0.5 });
     this.bgMusic.play();
+
 
     // Automatically go to GameScene after 5 seconds
     this.time.delayedCall(20000, () => {
       this.bgMusic.stop();
       this.scene.start('GameScene1');
     });
+    
 
     // Optional: Click to skip
     this.input.once('pointerdown', () => {
@@ -114,6 +124,7 @@ class GameScene1 extends Phaser.Scene {
       // Hide input after use
       emailInput.style.display = 'none';
       gamerEmail = email;
+      localStorage.setItem('gem', gamerEmail);
 
       // Show feedback in game
       this.add.text(width / 2, height / 2 + 50, `\n \n You Entered: ${email} `, {
@@ -126,6 +137,8 @@ class GameScene1 extends Phaser.Scene {
         font: '48px Arial',
         fill: '#ffffff'
       }).setOrigin(0.5);
+
+      localStorage.setItem('csKey', 'GameScene1');
   
       // Wait for user interaction
       this.input.once('pointerdown', () => {
@@ -156,28 +169,17 @@ class GameScene2 extends Phaser.Scene {
     }).setOrigin(0.5);
 
     // Show the HTML input box
-    /*const emailInput = document.getElementById('email-input');
-    emailInput.style.display = 'block';
-
-    // Optional: Autofocus
-    emailInput.focus();
-
-    // Listen for when user presses Enter or clicks away
-    emailInput.addEventListener('change', () => {
-      const email = emailInput.value;
-      console.log('User email:', email);
-
-      // Hide input after use
-      emailInput.style.display = 'none';
-      gamerEmail = email;
-    });
-    */
+    const task1 = document.getElementById('divtask1');
+    task1.style.display = 'block';
 
 
-    this.add.text(width / 2, height * 0.5, 'Tap the screen to Continue', {
+    /*this.add.text(width / 2, height * 0.5, 'Tap the screen to Continue', {
       font: '48px Arial',
       fill: '#ffffff'
     }).setOrigin(0.5);
+    */
+
+    localStorage.setItem('csKey', 'GameScene2');
 
     // Wait for user interaction
     this.input.once('pointerdown', () => {
@@ -192,21 +194,72 @@ class GameScene2 extends Phaser.Scene {
 
 
 
-
-const config = {
-  type: Phaser.AUTO,
-  width: window.innerWidth,
-  height: window.innerHeight,
-  parent: 'game-container', // match your HTML
-  scale: {
-    mode: Phaser.Scale.FIT,     // or RESIZE
-    autoCenter: Phaser.Scale.CENTER_BOTH
-  },
-  scene: [BootScene, WelcomeScene, GameScene1, GameScene2],
-  audio: {
-    disableWebAudio: false
-  }
-};
+if(currentScene ==='GameScene2'){
+  config = {
+    type: Phaser.AUTO,
+    width: window.innerWidth,
+    height: window.innerHeight,
+    parent: 'game-container', // match your HTML
+    scale: {
+      mode: Phaser.Scale.FIT,     // or RESIZE
+      autoCenter: Phaser.Scale.CENTER_BOTH
+    },
+    scene: [GameScene2],
+    audio: {
+      disableWebAudio: false
+    }
+  };
+}
+else if(currentScene ==='GameScene1'){
+  config = {
+    type: Phaser.AUTO,
+    width: window.innerWidth,
+    height: window.innerHeight,
+    parent: 'game-container', // match your HTML
+    scale: {
+      mode: Phaser.Scale.FIT,     // or RESIZE
+      autoCenter: Phaser.Scale.CENTER_BOTH
+    },
+    scene: [GameScene1, GameScene2],
+    audio: {
+      disableWebAudio: false
+    }
+  };
+}
+else if(currentScene ==='WelcomeScene'){
+  config = {
+    type: Phaser.AUTO,
+    width: window.innerWidth,
+    height: window.innerHeight,
+    parent: 'game-container', // match your HTML
+    scale: {
+      mode: Phaser.Scale.FIT,     // or RESIZE
+      autoCenter: Phaser.Scale.CENTER_BOTH
+    },
+    scene: [WelcomeScene, GameScene1, GameScene2],
+    audio: {
+      disableWebAudio: false
+    }
+  };
+}
+else if(currentScene ==='BootScene' || currentScene ===undefined || currentScene ===null || currentScene ===''){
+  config = {
+    type: Phaser.AUTO,
+    width: window.innerWidth,
+    height: window.innerHeight,
+    parent: 'game-container', // match your HTML
+    scale: {
+      mode: Phaser.Scale.FIT,     // or RESIZE
+      autoCenter: Phaser.Scale.CENTER_BOTH
+    },
+    scene: [BootScene, WelcomeScene, GameScene1, GameScene2],
+    audio: {
+      disableWebAudio: false
+    }
+  };
+}
 
 
 new Phaser.Game(config);
+
+console.log(currentScene);

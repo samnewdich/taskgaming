@@ -111,15 +111,15 @@ class GameScene1 extends Phaser.Scene {
         fill: '#ffff00'
       }).setOrigin(0.5);
     });
-    
+
   }
 }
 
 
 const config = {
   type: Phaser.AUTO,
-  width: '100%',
-  height: '100%',
+  width: window.innerWidth,
+  height: window.innerHeight,
   parent: 'game-container', // match your HTML
   scale: {
     mode: Phaser.Scale.FIT,     // or RESIZE

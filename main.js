@@ -13,9 +13,9 @@ class BootScene extends Phaser.Scene {
     const { width, height } = this.scale;
 
     // Show simple start screen
-    this.add.image(width / 2, height / 2, 'welcome-bg').setDisplaySize(width, height);
+    //this.add.image(width / 2, height / 2, 'welcome-bg').setDisplaySize(width, height);
 
-    this.add.text(width / 2, height * 0.5, 'Tap to Start', {
+    this.add.text(width / 2, height * 0.5, 'Press any key to Start Game', {
       font: '48px Arial',
       fill: '#ffffff'
     }).setOrigin(0.5);

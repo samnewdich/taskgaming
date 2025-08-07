@@ -17,8 +17,9 @@ class WelcomeScene extends Phaser.Scene {
       .setDisplaySize(width, height);
 
     // Add logo centered horizontally, higher vertically
-    this.logo = this.add.image(width / 2, height * 0.3, 'logo')
+    /*this.logo = this.add.image(width / 2, height * 0.3, 'logo')
       .setScale(0.5);
+      */
 
     // Add welcome text
     this.add.text(width / 2, height * 0.5, 'Welcome to the Game', {
@@ -36,7 +37,7 @@ class WelcomeScene extends Phaser.Scene {
     this.bgMusic.play();
 
     // Automatically go to GameScene after 5 seconds
-    this.time.delayedCall(5000, () => {
+    this.time.delayedCall(25000, () => {
       this.bgMusic.stop();
       this.scene.start('GameScene');
     });
@@ -57,7 +58,7 @@ class GameScene extends Phaser.Scene {
   create() {
     const { width, height } = this.scale;
 
-    this.add.text(width / 2, height / 2, 'Game Started!', {
+    this.add.text(width / 2, height / 2, 'Game is starting..', {
       font: '48px Arial',
       fill: '#ffffff'
     }).setOrigin(0.5);

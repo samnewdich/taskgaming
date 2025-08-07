@@ -1,3 +1,5 @@
+let gamerEmail;
+
 class BootScene extends Phaser.Scene {
   constructor() {
     super('BootScene');
@@ -64,7 +66,7 @@ class WelcomeScene extends Phaser.Scene {
     this.bgMusic.play();
 
     // Automatically go to GameScene after 5 seconds
-    this.time.delayedCall(60000, () => {
+    this.time.delayedCall(20000, () => {
       this.bgMusic.stop();
       this.scene.start('GameScene1');
     });
@@ -77,6 +79,13 @@ class WelcomeScene extends Phaser.Scene {
   }
 }
 
+
+
+
+
+
+
+
 class GameScene1 extends Phaser.Scene {
   constructor() {
     super('GameScene1');
@@ -85,7 +94,7 @@ class GameScene1 extends Phaser.Scene {
   create() {
     const { width, height } = this.scale;
 
-    this.add.text(width / 2, height / 2, 'Enter your email to..', {
+    this.add.text(width / 2, height / 2, 'Enter email to continue', {
       font: '48px Arial',
       fill: '#ffffff'
     }).setOrigin(0.5);
@@ -104,16 +113,84 @@ class GameScene1 extends Phaser.Scene {
 
       // Hide input after use
       emailInput.style.display = 'none';
+      gamerEmail = email;
 
       // Show feedback in game
-      this.add.text(width / 2, height / 2 + 50, `You entered: ${email}`, {
+      this.add.text(width / 2, height / 2 + 50, `\n \n You Entered: ${email} `, {
         font: '24px Arial',
         fill: '#ffff00'
       }).setOrigin(0.5);
+      
+
+      this.add.text(width / 2, height * 0.5, `\n \n \n \n \n Tap the screen to Continue`, {
+        font: '48px Arial',
+        fill: '#ffffff'
+      }).setOrigin(0.5);
+  
+      // Wait for user interaction
+      this.input.once('pointerdown', () => {
+        this.scene.start('GameScene2');
+      });
+
+
     });
 
   }
 }
+
+
+
+
+
+class GameScene2 extends Phaser.Scene {
+  constructor() {
+    super('GameScene2');
+  }
+
+  create() {
+    const { width, height } = this.scale;
+
+    this.add.text(width / 2, height / 2, `Welcome ${gamerEmail} \n \n`, {
+      font: '48px Arial',
+      fill: '#ffffff'
+    }).setOrigin(0.5);
+
+    // Show the HTML input box
+    /*const emailInput = document.getElementById('email-input');
+    emailInput.style.display = 'block';
+
+    // Optional: Autofocus
+    emailInput.focus();
+
+    // Listen for when user presses Enter or clicks away
+    emailInput.addEventListener('change', () => {
+      const email = emailInput.value;
+      console.log('User email:', email);
+
+      // Hide input after use
+      emailInput.style.display = 'none';
+      gamerEmail = email;
+    });
+    */
+
+
+    this.add.text(width / 2, height * 0.5, 'Tap the screen to Continue', {
+      font: '48px Arial',
+      fill: '#ffffff'
+    }).setOrigin(0.5);
+
+    // Wait for user interaction
+    this.input.once('pointerdown', () => {
+      this.scene.start('GameScene2');
+    });
+
+  }
+}
+
+
+
+
+
 
 
 const config = {
@@ -125,7 +202,7 @@ const config = {
     mode: Phaser.Scale.FIT,     // or RESIZE
     autoCenter: Phaser.Scale.CENTER_BOTH
   },
-  scene: [BootScene, WelcomeScene, GameScene1],
+  scene: [BootScene, WelcomeScene, GameScene1, GameScene2],
   audio: {
     disableWebAudio: false
   }

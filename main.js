@@ -66,13 +66,13 @@ class WelcomeScene extends Phaser.Scene {
     // Automatically go to GameScene after 5 seconds
     this.time.delayedCall(60000, () => {
       this.bgMusic.stop();
-      this.scene.start('GameScene');
+      this.scene.start('GameScene1');
     });
 
     // Optional: Click to skip
     this.input.once('pointerdown', () => {
       this.bgMusic.stop();
-      this.scene.start('GameScene');
+      this.scene.start('GameScene1');
     });
   }
 }
@@ -125,7 +125,7 @@ const config = {
     mode: Phaser.Scale.FIT,     // or RESIZE
     autoCenter: Phaser.Scale.CENTER_BOTH
   },
-  scene: [BootScene, WelcomeScene, GameScene],
+  scene: [BootScene, WelcomeScene, GameScene1],
   audio: {
     disableWebAudio: false
   }

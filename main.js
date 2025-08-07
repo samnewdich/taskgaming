@@ -12,6 +12,10 @@ class WelcomeScene extends Phaser.Scene {
   create() {
     const { width, height } = this.scale;
 
+    // Play background music
+    this.bgMusic = this.sound.add('bg-music', { loop: true, volume: 0.5 });
+    this.bgMusic.play();
+
     // Add background scaled to fill screen
     this.add.image(width / 2, height / 2, 'welcome-bg')
       .setDisplaySize(width, height);
@@ -39,7 +43,7 @@ class WelcomeScene extends Phaser.Scene {
     this.bgMusic.play();
 
     // Automatically go to GameScene after 5 seconds
-    this.time.delayedCall(25000, () => {
+    this.time.delayedCall(55000, () => {
       this.bgMusic.stop();
       this.scene.start('GameScene');
     });

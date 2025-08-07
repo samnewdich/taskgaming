@@ -66,12 +66,20 @@ class GameScene extends Phaser.Scene {
 
 const config = {
   type: Phaser.AUTO,
-  width: 1400,
-  height: 1000,
+  width: '100%',
+  height: '100%',
+  parent: 'game-container', // match your HTML
+  scale: {
+    mode: Phaser.Scale.FIT,     // or RESIZE
+    autoCenter: Phaser.Scale.CENTER_BOTH,
+    width: 1400,
+    height: 1000
+  },
   scene: [WelcomeScene, GameScene],
   audio: {
     disableWebAudio: false
   }
 };
+
 
 new Phaser.Game(config);

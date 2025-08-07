@@ -15,7 +15,7 @@ class BootScene extends Phaser.Scene {
     // Show simple start screen
     //this.add.image(width / 2, height / 2, 'welcome-bg').setDisplaySize(width, height);
 
-    this.add.text(width / 2, height * 0.5, 'Press any key to Start Game', {
+    this.add.text(width / 2, height * 0.5, 'Tap the screen to Start Game', {
       font: '48px Arial',
       fill: '#ffffff'
     }).setOrigin(0.5);
@@ -64,7 +64,7 @@ class WelcomeScene extends Phaser.Scene {
     this.bgMusic.play();
 
     // Automatically go to GameScene after 5 seconds
-    this.time.delayedCall(180000, () => {
+    this.time.delayedCall(60000, () => {
       this.bgMusic.stop();
       this.scene.start('GameScene');
     });
@@ -77,18 +77,41 @@ class WelcomeScene extends Phaser.Scene {
   }
 }
 
-class GameScene extends Phaser.Scene {
+class GameScene1 extends Phaser.Scene {
   constructor() {
-    super('GameScene');
+    super('GameScene1');
   }
 
   create() {
     const { width, height } = this.scale;
 
-    this.add.text(width / 2, height / 2, 'Game is starting..', {
+    this.add.text(width / 2, height / 2, 'Enter your email to..', {
       font: '48px Arial',
       fill: '#ffffff'
     }).setOrigin(0.5);
+
+    // Show the HTML input box
+    const emailInput = document.getElementById('email-input');
+    emailInput.style.display = 'block';
+
+    // Optional: Autofocus
+    emailInput.focus();
+
+    // Listen for when user presses Enter or clicks away
+    emailInput.addEventListener('change', () => {
+      const email = emailInput.value;
+      console.log('User email:', email);
+
+      // Hide input after use
+      emailInput.style.display = 'none';
+
+      // Show feedback in game
+      this.add.text(width / 2, height / 2 + 50, `You entered: ${email}`, {
+        font: '24px Arial',
+        fill: '#ffff00'
+      }).setOrigin(0.5);
+    });
+    
   }
 }
 

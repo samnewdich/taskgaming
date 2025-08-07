@@ -11,6 +11,11 @@ class BootScene extends Phaser.Scene {
     this.load.image('welcome-bg', 'assets/welcome-bg.png');
     this.load.image('logo', 'assets/logo.png');
     this.load.audio('bg-music', 'assets/bg-music.mp3');
+
+    //gaming
+    this.load.image('basket', 'assets/basket.png');
+    this.load.image('orange', 'assets/orange.png');
+    this.load.audio('catch-sound', 'assets/catch.mp3');
   }
 
   create() {
@@ -170,7 +175,7 @@ class GameScene2 extends Phaser.Scene {
 
     // Show the HTML input box
     const task1 = document.getElementById('divtask1');
-    task1.style.display = 'block';
+    task1.style.display = 'none';
 
 
     /*this.add.text(width / 2, height * 0.5, 'Tap the screen to Continue', {
@@ -183,7 +188,7 @@ class GameScene2 extends Phaser.Scene {
 
     // Wait for user interaction
     this.input.once('pointerdown', () => {
-      this.scene.start('GameScene2');
+      this.scene.start('GameScene3');
     });
 
   }
@@ -193,8 +198,169 @@ class GameScene2 extends Phaser.Scene {
 
 
 
+class GameScene3 extends Phaser.Scene {
+  constructor() {
+      super('GameScene3');
+      this.score = 0;
+  }
 
-if(currentScene ==='GameScene2'){
+  create() {
+      const { width, height } = this.scale;
+
+      localStorage.setItem('csKey', 'GameScene3');
+
+      // Player basket
+      this.player = this.physics.add.sprite(width / 2, height - 50, 'basket')
+          .setCollideWorldBounds(true)
+          .setScale(0.5);
+
+      // Group of oranges
+      this.oranges = this.physics.add.group({
+          key: 'orange',
+          repeat: 20,
+          setXY: { x: Phaser.Math.Between(50, width - 50), y: 0, stepX: 0 }
+      });
+
+      this.oranges.children.iterate((orange) => {
+          orange.setScale(0.2);
+          orange.setVelocityY(Phaser.Math.Between(150, 300));
+          orange.x = Phaser.Math.Between(50, width - 50);
+      });
+
+      // Collision between basket and oranges
+      this.physics.add.overlap(this.player, this.oranges, this.catchOrange, null, this);
+
+      // Score text
+      this.scoreText = this.add.text(20, 20, 'Score: 0', {
+          fontSize: '32px',
+          fill: '#fff'
+      });
+
+      // Input for desktop
+      this.cursors = this.input.keyboard.createCursorKeys();
+
+      // Input for touch
+      this.input.on('pointermove', (pointer) => {
+          this.player.x = pointer.x;
+      });
+  }
+
+  update() {
+      // Desktop control
+      if (this.cursors.left.isDown) {
+          this.player.setVelocityX(-300);
+      } else if (this.cursors.right.isDown) {
+          this.player.setVelocityX(300);
+      } else {
+          this.player.setVelocityX(0);
+      }
+
+      // Respawn oranges that fall off
+      this.oranges.children.iterate((orange) => {
+          if (orange.y > this.scale.height) {
+              orange.y = 0;
+              orange.x = Phaser.Math.Between(50, this.scale.width - 50);
+              orange.setVelocityY(Phaser.Math.Between(150, 300));
+          }
+      });
+  }
+
+  catchOrange(player, orange) {
+      this.sound.play('catch-sound', { volume: 0.3 });
+      orange.y = 0;
+      orange.x = Phaser.Math.Between(50, this.scale.width - 50);
+      orange.setVelocityY(Phaser.Math.Between(150, 300));
+
+      this.score += 1;
+      this.scoreText.setText('Score: ' + this.score);
+
+      if (this.score >= 200) {
+          this.scene.start('WinScene1', { score: this.score });
+      }
+  }
+}
+
+
+
+
+class WinScene1 extends Phaser.Scene {
+  constructor() {
+      super('WinScene1');
+  }
+
+  init(data) {
+      this.finalScore = data.score;
+  }
+
+  create() {
+    localStorage.setItem('csKey', 'GameScene3');
+      const { width, height } = this.scale;
+      this.add.text(width / 2, height / 2, `🎉 You Win! 🎉\nScore: ${this.finalScore}`, {
+          fontSize: '48px',
+          fill: '#ffff00',
+          align: 'center'
+      }).setOrigin(0.5);
+
+      this.input.once('pointerdown', () => {
+          this.scene.start('GameScene3');
+      });
+  }
+}
+
+
+
+
+
+
+
+
+if(currentScene ==='WinScene1'){
+  config = {
+    type: Phaser.AUTO,
+    width: window.innerWidth,
+    height: window.innerHeight,
+    parent: 'game-container', // match your HTML
+    physics: {
+      default: 'arcade',
+      arcade: {
+          gravity: { y: 0 },
+          debug: false
+      }
+  },
+    scale: {
+      mode: Phaser.Scale.FIT,     // or RESIZE
+      autoCenter: Phaser.Scale.CENTER_BOTH
+    },
+    scene: [WinScene1],
+    audio: {
+      disableWebAudio: false
+    }
+  };
+}
+else if(currentScene ==='GameScene3'){
+  config = {
+    type: Phaser.AUTO,
+    width: window.innerWidth,
+    height: window.innerHeight,
+    parent: 'game-container', // match your HTML
+    physics: {
+      default: 'arcade',
+      arcade: {
+          gravity: { y: 0 },
+          debug: false
+      }
+  },
+    scale: {
+      mode: Phaser.Scale.FIT,     // or RESIZE
+      autoCenter: Phaser.Scale.CENTER_BOTH
+    },
+    scene: [GameScene3, WinScene1],
+    audio: {
+      disableWebAudio: false
+    }
+  };
+}
+else if(currentScene ==='GameScene2'){
   config = {
     type: Phaser.AUTO,
     width: window.innerWidth,
@@ -204,7 +370,7 @@ if(currentScene ==='GameScene2'){
       mode: Phaser.Scale.FIT,     // or RESIZE
       autoCenter: Phaser.Scale.CENTER_BOTH
     },
-    scene: [GameScene2],
+    scene: [GameScene2, GameScene3],
     audio: {
       disableWebAudio: false
     }
@@ -220,7 +386,7 @@ else if(currentScene ==='GameScene1'){
       mode: Phaser.Scale.FIT,     // or RESIZE
       autoCenter: Phaser.Scale.CENTER_BOTH
     },
-    scene: [GameScene1, GameScene2],
+    scene: [GameScene1, GameScene2, GameScene3],
     audio: {
       disableWebAudio: false
     }
@@ -236,7 +402,7 @@ else if(currentScene ==='WelcomeScene'){
       mode: Phaser.Scale.FIT,     // or RESIZE
       autoCenter: Phaser.Scale.CENTER_BOTH
     },
-    scene: [WelcomeScene, GameScene1, GameScene2],
+    scene: [WelcomeScene, GameScene1, GameScene2, GameScene3],
     audio: {
       disableWebAudio: false
     }
@@ -252,7 +418,7 @@ else if(currentScene ==='BootScene' || currentScene ===undefined || currentScene
       mode: Phaser.Scale.FIT,     // or RESIZE
       autoCenter: Phaser.Scale.CENTER_BOTH
     },
-    scene: [BootScene, WelcomeScene, GameScene1, GameScene2],
+    scene: [BootScene, WelcomeScene, GameScene1, GameScene2, GameScene3],
     audio: {
       disableWebAudio: false
     }

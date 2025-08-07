@@ -2,18 +2,20 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Shooter Task Gateway</title>
-  <link rel="stylesheet" href="style.css" />
+  <title>Phaser Welcome Screen</title>
+  <script src="https://cdn.jsdelivr.net/npm/phaser@3.70.0/dist/phaser.js"></script>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+    }
+    canvas {
+      display: block;
+      margin: 0 auto;
+    }
+  </style>
 </head>
 <body>
-  <div class="container">
-    <h1>🎯 Complete Task to Play</h1>
-    <p>Task: Share our site on Twitter and tag @NewdichTech</p>
-    <button id="taskDoneBtn">✅ I did the task</button>
-    <button id="payToPlayBtn">💰 Pay 0.01 ETH to Play</button>
-  </div>
-
-  <script src="blockchain/evm.js"></script>
   <script src="main.js"></script>
 </body>
 </html>

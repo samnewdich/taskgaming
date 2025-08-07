@@ -33,7 +33,7 @@ class WelcomeScene extends Phaser.Scene {
     }).setOrigin(0.5);
 
     // Play background music
-    this.bgMusic = this.sound.add('bg-music', { loop: true, volume: 0.5 });
+    this.bgMusic = this.sound.add('bg-music', { loop: true, volume: 100.0 });
     this.bgMusic.play();
 
     // Automatically go to GameScene after 5 seconds

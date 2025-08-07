@@ -61,8 +61,8 @@ class GameScene extends Phaser.Scene {
 
 const config = {
   type: Phaser.AUTO,
-  width: 800,
-  height: 600,
+  width: 1400,
+  height: 1000,
   scene: [WelcomeScene, GameScene],
   audio: {
     disableWebAudio: false

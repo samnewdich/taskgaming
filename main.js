@@ -10,21 +10,24 @@ class WelcomeScene extends Phaser.Scene {
   }
 
   create() {
-    // Add background
-    this.add.image(400, 300, 'welcome-bg').setDisplaySize(800, 600);
+    const { width, height } = this.scale;
 
-    // Add logo
-    this.logo = this.add.image(400, 200, 'logo');
-    this.logo.setScale(0.5);
+    // Add background scaled to fill screen
+    this.add.image(width / 2, height / 2, 'welcome-bg')
+      .setDisplaySize(width, height);
+
+    // Add logo centered horizontally, higher vertically
+    this.logo = this.add.image(width / 2, height * 0.3, 'logo')
+      .setScale(0.5);
 
     // Add welcome text
-    this.add.text(400, 350, 'Welcome to the Game', {
-      font: '32px Arial',
+    this.add.text(width / 2, height * 0.5, 'Welcome to the Game', {
+      font: '48px Arial',
       fill: '#ffffff'
     }).setOrigin(0.5);
 
-    this.add.text(400, 400, 'Loading...', {
-      font: '24px Arial',
+    this.add.text(width / 2, height * 0.58, 'Loading...', {
+      font: '32px Arial',
       fill: '#cccccc'
     }).setOrigin(0.5);
 
@@ -52,8 +55,10 @@ class GameScene extends Phaser.Scene {
   }
 
   create() {
-    this.add.text(400, 300, 'Game Started!', {
-      font: '32px Arial',
+    const { width, height } = this.scale;
+
+    this.add.text(width / 2, height / 2, 'Game Started!', {
+      font: '48px Arial',
       fill: '#ffffff'
     }).setOrigin(0.5);
   }

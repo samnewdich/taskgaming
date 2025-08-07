@@ -22,18 +22,20 @@ class WelcomeScene extends Phaser.Scene {
       */
 
     // Add welcome text
-    this.add.text(width / 2, height * 0.5, 'Welcome to the Game', {
+    /*this.add.text(width / 2, height * 0.5, 'Welcome to the Game', {
       font: '48px Arial',
       fill: '#ffffff'
     }).setOrigin(0.5);
+    */
 
-    this.add.text(width / 2, height * 0.58, 'Loading...', {
+    /*this.add.text(width / 2, height * 0.58, 'Loading...', {
       font: '32px Arial',
       fill: '#cccccc'
     }).setOrigin(0.5);
+    */
 
     // Play background music
-    this.bgMusic = this.sound.add('bg-music', { loop: true, volume: 100.0 });
+    this.bgMusic = this.sound.add('bg-music', { loop: true, volume: 0.5 });
     this.bgMusic.play();
 
     // Automatically go to GameScene after 5 seconds

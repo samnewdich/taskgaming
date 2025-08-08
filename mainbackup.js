@@ -1,5 +1,5 @@
-let gamerEmail  = localStorage.getItem('gem') || '';;
-let currentScene = localStorage.getItem('csKey') || 'BootScene';
+let gamerEmail  = localStorage.getItem('gem') || 'BootScene';;
+let currentScene = localStorage.getItem('csKey') || '';
 let config;
 
 class AssetsScene extends Phaser.Scene {
@@ -191,7 +191,6 @@ class GameScene2 extends Phaser.Scene {
 
   create() {
     const { width, height } = this.scale;
-    localStorage.setItem('csKey', 'GameScene2');
 
     this.add.text(width / 2, height / 2, `Welcome ${gamerEmail} \n \n`, {
       font: '48px Arial',
@@ -200,21 +199,20 @@ class GameScene2 extends Phaser.Scene {
 
     // Show the HTML input box
     const task1 = document.getElementById('divtask1');
-    task1.style.display = 'block';
+    task1.style.display = 'none';
 
-    task1.addEventListener('click', () => {
-      task1.style.display="none";
 
-      this.add.text(width / 2, height * 0.5, '\n \n \n Game : Pick atleast 500 Oranges into the basket \n Duration : 1 minute. \n Are you ready ?\n Tap the screen to Play', {
-        font: '48px Arial',
-        fill: '#ffffff'
-      }).setOrigin(0.5);
-      
+    /*this.add.text(width / 2, height * 0.5, 'Tap the screen to Continue', {
+      font: '48px Arial',
+      fill: '#ffffff'
+    }).setOrigin(0.5);
+    */
 
-      // Wait for user interaction
-      this.input.once('pointerdown', () => {
-        this.scene.start('GameScene3');
-      });
+    localStorage.setItem('csKey', 'GameScene2');
+
+    // Wait for user interaction
+    this.input.once('pointerdown', () => {
+      this.scene.start('GameScene3');
     });
 
   }
@@ -228,65 +226,51 @@ class GameScene3 extends Phaser.Scene {
   constructor() {
       super('GameScene3');
       this.score = 0;
-      this.timeLeft = 60; // 2 minutes in seconds
   }
 
   create() {
       const { width, height } = this.scale;
+
       localStorage.setItem('csKey', 'GameScene3');
 
-      // Basket (player)
+      // Player basket
       this.player = this.physics.add.sprite(width / 2, height - 50, 'basket')
           .setCollideWorldBounds(true)
-          .setScale(0.3); // smaller
-
-      // "Fill" image to simulate oranges piling inside basket
-      this.basketFill = this.add.graphics();
-      this.fillLevel = 0; // how much it's filled
+          .setScale(0.5);
 
       // Group of oranges
-      this.oranges = this.physics.add.group();
-      for (let i = 0; i < 20; i++) {
-          const orange = this.oranges.create(
-              Phaser.Math.Between(50, width - 50),
-              Phaser.Math.Between(-300, 0),
-              'orange'
-          ).setScale(0.15); // smaller oranges
-          orange.setVelocityY(Phaser.Math.Between(150, 300));
-      }
+      this.oranges = this.physics.add.group({
+          key: 'orange',
+          repeat: 20,
+          setXY: { x: Phaser.Math.Between(50, width - 50), y: 0, stepX: 0 }
+      });
 
-      // Overlap: basket & oranges
+      this.oranges.children.iterate((orange) => {
+          orange.setScale(0.2);
+          orange.setVelocityY(Phaser.Math.Between(150, 300));
+          orange.x = Phaser.Math.Between(50, width - 50);
+      });
+
+      // Collision between basket and oranges
       this.physics.add.overlap(this.player, this.oranges, this.catchOrange, null, this);
 
       // Score text
       this.scoreText = this.add.text(20, 20, 'Score: 0', {
-          fontSize: '20px',
+          fontSize: '32px',
           fill: '#fff'
       });
 
-      // Timer text
-      this.timerText = this.add.text(width - 150, 20, 'Time: 2:00', {
-          fontSize: '20px',
-          fill: '#ff0000'
-      });
-
-      // Countdown
-      this.timerEvent = this.time.addEvent({
-          delay: 1000,
-          callback: this.updateTimer,
-          callbackScope: this,
-          loop: true
-      });
-
-      // Controls
+      // Input for desktop
       this.cursors = this.input.keyboard.createCursorKeys();
+
+      // Input for touch
       this.input.on('pointermove', (pointer) => {
           this.player.x = pointer.x;
       });
   }
 
   update() {
-      // Keyboard movement
+      // Desktop control
       if (this.cursors.left.isDown) {
           this.player.setVelocityX(-300);
       } else if (this.cursors.right.isDown) {
@@ -295,7 +279,7 @@ class GameScene3 extends Phaser.Scene {
           this.player.setVelocityX(0);
       }
 
-      // Reset oranges that fall
+      // Respawn oranges that fall off
       this.oranges.children.iterate((orange) => {
           if (orange.y > this.scale.height) {
               orange.y = 0;
@@ -303,90 +287,23 @@ class GameScene3 extends Phaser.Scene {
               orange.setVelocityY(Phaser.Math.Between(150, 300));
           }
       });
-
-      // Draw basket fill
-      this.basketFill.clear();
-      this.basketFill.fillStyle(0xffa500, 1);
-      const basketTop = this.player.y - 10;
-      const basketHeight = 30;
-      const fillHeight = (this.fillLevel / 500) * basketHeight;
-      this.basketFill.fillRect(
-          this.player.x - 25,
-          basketTop - fillHeight,
-          50,
-          fillHeight
-      );
   }
 
   catchOrange(player, orange) {
-      // Play catch sound if loaded
-      if (this.sound.get('catch-sound')) {
-          this.sound.play('catch-sound', { volume: 0.3 });
-      }
-
-      // Reset orange
+      this.sound.play('catch-sound', { volume: 0.3 });
       orange.y = 0;
       orange.x = Phaser.Math.Between(50, this.scale.width - 50);
       orange.setVelocityY(Phaser.Math.Between(150, 300));
 
-      // Update score
-      this.score++;
+      this.score += 1;
       this.scoreText.setText('Score: ' + this.score);
 
-      // Update fill level
-      if (this.fillLevel < 500) {
-          this.fillLevel++;
-      }
-
-      // Win condition
-      if (this.score >= 500) {
+      if (this.score >= 200) {
           this.scene.start('WinScene1', { score: this.score });
       }
   }
-
-  updateTimer() {
-      this.timeLeft--;
-      const minutes = Math.floor(this.timeLeft / 60);
-      const seconds = this.timeLeft % 60;
-      this.timerText.setText(`Time: ${minutes}:${seconds.toString().padStart(2, '0')}`);
-
-      if (this.timeLeft <= 0) {
-          // Time's up, check if player has won
-          if (this.score >= 500) {
-              this.scene.start('WinScene1', { score: this.score });
-          } else {
-              this.scene.start('LoseScene1', { score: this.score });
-          }
-      }
-  }
 }
 
-
-
-
-class LoseScene1 extends Phaser.Scene {
-  constructor() {
-      super('LoseScene1');
-  }
-
-  init(data) {
-      this.finalScore = data.score;
-  }
-
-  create() {
-    localStorage.setItem('csKey', 'GameScene3');
-      const { width, height } = this.scale;
-      this.add.text(width / 2, height / 2, `Oops!! You Lose! \nScore: ${this.finalScore}`, {
-          fontSize: '48px',
-          fill: '#f00',
-          align: 'center'
-      }).setOrigin(0.5);
-
-      this.input.once('pointerdown', () => {
-          this.scene.start('GameScene3');
-      });
-  }
-}
 
 
 
@@ -402,7 +319,7 @@ class WinScene1 extends Phaser.Scene {
   create() {
     localStorage.setItem('csKey', 'GameScene3');
       const { width, height } = this.scale;
-      this.add.text(width / 2, height / 2, `Congratulations, You Win! \nScore: ${this.finalScore}`, {
+      this.add.text(width / 2, height / 2, `🎉 You Win! 🎉\nScore: ${this.finalScore}`, {
           fontSize: '48px',
           fill: '#ffff00',
           align: 'center'
@@ -420,30 +337,8 @@ class WinScene1 extends Phaser.Scene {
 
 
 
-if(currentScene ==='LoseScene1'){
-  config = {
-    type: Phaser.AUTO,
-    width: window.innerWidth,
-    height: window.innerHeight,
-    parent: 'game-container', // match your HTML
-    physics: {
-      default: 'arcade',
-      arcade: {
-          gravity: { y: 0 },
-          debug: false
-      }
-  },
-    scale: {
-      mode: Phaser.Scale.FIT,     // or RESIZE
-      autoCenter: Phaser.Scale.CENTER_BOTH
-    },
-    scene: [AssetsScene, LoseScene1],
-    audio: {
-      disableWebAudio: false
-    }
-  };
-}
-else if(currentScene ==='WinScene1'){
+
+if(currentScene ==='WinScene1'){
   config = {
     type: Phaser.AUTO,
     width: window.innerWidth,
@@ -478,12 +373,12 @@ else if(currentScene ==='GameScene3'){
           gravity: { y: 0 },
           debug: false
       }
-    },
+  },
     scale: {
       mode: Phaser.Scale.FIT,     // or RESIZE
       autoCenter: Phaser.Scale.CENTER_BOTH
     },
-    scene: [AssetsScene, GameScene3, WinScene1, LoseScene1],
+    scene: [AssetsScene, GameScene3, WinScene1],
     audio: {
       disableWebAudio: false
     }
@@ -495,18 +390,11 @@ else if(currentScene ==='GameScene2'){
     width: window.innerWidth,
     height: window.innerHeight,
     parent: 'game-container', // match your HTML
-    physics: {
-      default: 'arcade',
-      arcade: {
-          gravity: { y: 0 },
-          debug: false
-      }
-    },
     scale: {
       mode: Phaser.Scale.FIT,     // or RESIZE
       autoCenter: Phaser.Scale.CENTER_BOTH
     },
-    scene: [AssetsScene, GameScene2, GameScene3, WinScene1, LoseScene1],
+    scene: [AssetsScene, GameScene2, GameScene3],
     audio: {
       disableWebAudio: false
     }
@@ -518,18 +406,11 @@ else if(currentScene ==='GameScene1'){
     width: window.innerWidth,
     height: window.innerHeight,
     parent: 'game-container', // match your HTML
-    physics: {
-      default: 'arcade',
-      arcade: {
-          gravity: { y: 0 },
-          debug: false
-      }
-    },
     scale: {
       mode: Phaser.Scale.FIT,     // or RESIZE
       autoCenter: Phaser.Scale.CENTER_BOTH
     },
-    scene: [AssetsScene, GameScene1, GameScene2, GameScene3, WinScene1, LoseScene1],
+    scene: [AssetsScene, GameScene1, GameScene2, GameScene3],
     audio: {
       disableWebAudio: false
     }
@@ -541,18 +422,11 @@ else if(currentScene ==='WelcomeScene'){
     width: window.innerWidth,
     height: window.innerHeight,
     parent: 'game-container', // match your HTML
-    physics: {
-      default: 'arcade',
-      arcade: {
-          gravity: { y: 0 },
-          debug: false
-      }
-    },
     scale: {
       mode: Phaser.Scale.FIT,     // or RESIZE
       autoCenter: Phaser.Scale.CENTER_BOTH
     },
-    scene: [AssetsScene, WelcomeScene, GameScene1, GameScene2, GameScene3, WinScene1, LoseScene1],
+    scene: [AssetsScene, WelcomeScene, GameScene1, GameScene2, GameScene3],
     audio: {
       disableWebAudio: false
     }
@@ -564,18 +438,11 @@ else if(currentScene ==='BootScene' || currentScene ===undefined || currentScene
     width: window.innerWidth,
     height: window.innerHeight,
     parent: 'game-container', // match your HTML
-    physics: {
-      default: 'arcade',
-      arcade: {
-          gravity: { y: 0 },
-          debug: false
-      }
-    },
     scale: {
       mode: Phaser.Scale.FIT,     // or RESIZE
       autoCenter: Phaser.Scale.CENTER_BOTH
     },
-    scene: [AssetsScene, BootScene, WelcomeScene, GameScene1, GameScene2, GameScene3, WinScene1, LoseScene1],
+    scene: [AssetsScene, BootScene, WelcomeScene, GameScene1, GameScene2, GameScene3],
     audio: {
       disableWebAudio: false
     }

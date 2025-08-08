@@ -1,5 +1,6 @@
 let gamerEmail  = localStorage.getItem('gem') || '';;
 let currentScene = localStorage.getItem('csKey') || 'BootScene';
+let backGroundMusic;
 let config;
 
 class AssetsScene extends Phaser.Scene {
@@ -213,6 +214,7 @@ class GameScene2 extends Phaser.Scene {
 
       // Wait for user interaction
       this.input.once('pointerdown', () => {
+        backGroundMusic = this.sound.add('bg-music', { loop: true, volume: 0.5 });
         this.scene.start('GameScene3');
       });
     });
@@ -234,6 +236,10 @@ class GameScene3 extends Phaser.Scene {
   create() {
       const { width, height } = this.scale;
       localStorage.setItem('csKey', 'GameScene3');
+
+      //Add Background music
+      //backGroundMusic = this.sound.add('bg-music', { loop: true, volume: 0.5 });
+      backGroundMusic.play();
 
       // Basket (player)
       this.player = this.physics.add.sprite(width / 2, height - 50, 'basket')
@@ -259,7 +265,7 @@ class GameScene3 extends Phaser.Scene {
       this.physics.add.overlap(this.player, this.oranges, this.catchOrange, null, this);
 
       // Score text
-      this.scoreText = this.add.text(20, 20, 'Score: 0', {
+      this.scoreText = this.add.text(20, 20, 'Oranges Picked: 0', {
           fontSize: '20px',
           fill: '#fff'
       });
@@ -321,7 +327,7 @@ class GameScene3 extends Phaser.Scene {
   catchOrange(player, orange) {
       // Play catch sound if loaded
       if (this.sound.get('catch-sound')) {
-          this.sound.play('catch-sound', { volume: 0.3 });
+          this.sound.play('catch-sound', { volume: 0.5 });
       }
 
       // Reset orange
@@ -331,7 +337,7 @@ class GameScene3 extends Phaser.Scene {
 
       // Update score
       this.score++;
-      this.scoreText.setText('Score: ' + this.score);
+      this.scoreText.setText('Oranges Picked: ' + this.score);
 
       // Update fill level
       if (this.fillLevel < 500) {
@@ -340,6 +346,7 @@ class GameScene3 extends Phaser.Scene {
 
       // Win condition
       if (this.score >= 500) {
+          backGroundMusic.stop();
           this.scene.start('WinScene1', { score: this.score });
       }
   }
@@ -353,9 +360,11 @@ class GameScene3 extends Phaser.Scene {
       if (this.timeLeft <= 0) {
           // Time's up, check if player has won
           if (this.score >= 500) {
-              this.scene.start('WinScene1', { score: this.score });
+            backGroundMusic.stop();
+            this.scene.start('WinScene1', { score: this.score });
           } else {
-              this.scene.start('LoseScene1', { score: this.score });
+            backGroundMusic.stop();
+            this.scene.start('LoseScene1', { score: this.score });
           }
       }
   }
@@ -376,7 +385,7 @@ class LoseScene1 extends Phaser.Scene {
   create() {
     localStorage.setItem('csKey', 'GameScene3');
       const { width, height } = this.scale;
-      this.add.text(width / 2, height / 2, `Oops!! You Lose! \nScore: ${this.finalScore}`, {
+      this.add.text(width / 2, height / 2, `Oops!! You Lose! \n Total Oranges Picked: ${this.finalScore}`, {
           fontSize: '48px',
           fill: '#f00',
           align: 'center'
@@ -402,7 +411,7 @@ class WinScene1 extends Phaser.Scene {
   create() {
     localStorage.setItem('csKey', 'GameScene3');
       const { width, height } = this.scale;
-      this.add.text(width / 2, height / 2, `Congratulations, You Win! \nScore: ${this.finalScore}`, {
+      this.add.text(width / 2, height / 2, `Congratulations, You Win! \n Total Oranges Picked: ${this.finalScore}`, {
           fontSize: '48px',
           fill: '#ffff00',
           align: 'center'

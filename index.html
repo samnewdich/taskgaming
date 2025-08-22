@@ -59,6 +59,72 @@
       font-size: 18px;
       cursor: pointer;
     }
+
+    #task2{
+      /*position:absolute;
+      top: 400px;
+      left: 50%;
+      width: 50%;
+      */
+      width: 50%;
+      height: 50px;
+      margin-bottom: 20px;
+      background-color: royalblue;
+      color: white;
+      border: none;
+      font-size: 18px;
+      cursor: pointer;
+    }
+    #pay2{
+      /*position:absolute;
+      top: 400px;
+      left: 50%;
+      width: 50%;
+      */
+      margin-top: 20px;
+      width: 50%;
+      height: 50px;
+      background-color: lightseagreen;
+      color: black;
+      border: none;
+      font-size: 18px;
+      cursor: pointer;
+    }
+
+
+    #task3{
+      /*position:absolute;
+      top: 400px;
+      left: 50%;
+      width: 50%;
+      */
+      width: 50%;
+      height: 50px;
+      margin-bottom: 20px;
+      background-color: royalblue;
+      color: white;
+      border: none;
+      font-size: 18px;
+      cursor: pointer;
+    }
+    #pay3{
+      /*position:absolute;
+      top: 400px;
+      left: 50%;
+      width: 50%;
+      */
+      margin-top: 20px;
+      width: 50%;
+      height: 50px;
+      background-color: lightseagreen;
+      color: black;
+      border: none;
+      font-size: 18px;
+      cursor: pointer;
+    }
+
+
+
     #divtask1{
       position: absolute;
       top: 350px;
@@ -68,6 +134,27 @@
       display: none;
       color: white;
     }
+
+    #divtask2{
+      position: absolute;
+      top: 350px;
+      left: 25%;
+      width: 50%;
+      text-align: center;
+      display: none;
+      color: white;
+    }
+
+    #divtask3{
+      position: absolute;
+      top: 350px;
+      left: 25%;
+      width: 50%;
+      text-align: center;
+      display: none;
+      color: white;
+    }
+
     h3{
       color: goldenrod;
     }
@@ -94,11 +181,28 @@
     <input type="email" id="email-input" placeholder="Enter your email">
     <div id="divtask1">
       <h3>Task 1</h3>
-      <button id="task1">Follow Us on LinkedIn</button>
+      <a href="https://www.linkedin.com/company/newdichtechnology/" target="_blank" style="text-decoration: none;"><button id="task1">Follow Us on LinkedIn</button></a>
       <br/>OR<br/>
       <button id="pay1">Make Paymemt</button>
     </div>
-    <button id="logout" onclick="logout()">LOG</button>
+
+    <div id="divtask2">
+      <h3>Task 2</h3>
+      <a href="https://facebook.com/newdich" target="_blank" style="text-decoration: none;"><button id="task2">Follow Us on Facebook</button></a>
+      <br/>OR<br/>
+      <button id="pay2">Make Paymemt</button>
+    </div>
+
+
+    <div id="divtask3">
+      <h3>Task 3</h3>
+      <a href="https://x.com/newdichtech" target="_blank" style="text-decoration: none;"><button id="task3">Follow Us on Twitter(X)</button></a>
+      <br/>OR<br/>
+      <button id="pay3">Make Paymemt</button>
+    </div>
+
+
+    <a href="" target="_blank" style="text-decoration: none;"><button id="logout" onclick="logout()">LOG</button></a>
   </div>
 
   <script src="phaser.js"></script>

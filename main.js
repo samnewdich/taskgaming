@@ -2,6 +2,7 @@ let gamerEmail  = localStorage.getItem('gem') || '';;
 let currentScene = localStorage.getItem('csKey') || 'BootScene';
 let backGroundMusic;
 let config;
+let phaserScene = this.scene;
 
 class AssetsScene extends Phaser.Scene {
   constructor() {
@@ -136,52 +137,109 @@ class GameScene1 extends Phaser.Scene {
   create() {
     const { width, height } = this.scale;
 
-    this.add.text(width / 2, height / 2, 'Enter email to continue', {
-      font: '48px Arial',
-      fill: '#ffffff'
-    }).setOrigin(0.5);
-
     // Show the HTML input box
-    const emailInput = document.getElementById('email-input');
+    const emailInput = document.getElementById('table-input');
     emailInput.style.display = 'block';
 
-    // Optional: Autofocus
+    // Autofocus
     emailInput.focus();
 
-    // Listen for when user presses Enter or clicks away
-    emailInput.addEventListener('change', () => {
-      const email = emailInput.value;
-      console.log('User email:', email);
+    const logBtn = document.getElementById("logbtn");
+    const regBtn = document.getElementById("regbtn");
 
-      // Hide input after use
-      emailInput.style.display = 'none';
-      gamerEmail = email;
-      localStorage.setItem('gem', gamerEmail);
+    //LOGIN BUTTON LISTENER ===
+    logBtn.addEventListener('click', () => {
+      let logEmail = document.getElementById("email").value;
+      let logPwd = document.getElementById("password").value;
 
-      // Show feedback in game
-      this.add.text(width / 2, height / 2 + 50, `\n \n You Entered: ${email} `, {
-        font: '24px Arial',
-        fill: '#ffff00'
-      }).setOrigin(0.5);
-      
+      if (!logEmail || !logPwd) {
+        document.getElementById("output").innerHTML =
+          `<font style="color:red;">Email And Password Cannot be empty</font>`;
+      } else {
+        async function loginUser() {
+          const api = await fetch('login.php', {
+            method: "POST",
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+              email: logEmail,
+              password: logPwd
+            })
+          });
 
-      this.add.text(width / 2, height * 0.5, `\n \n \n \n \n Tap the screen to Continue`, {
-        font: '48px Arial',
-        fill: '#ffffff'
-      }).setOrigin(0.5);
+          const result = await api.json();
+          if (api.ok) {
+            if (result.status === "success") {
+              // store in localStorage (must be stringified)
+              localStorage.setItem('userdata', JSON.stringify(result.response));
 
-      localStorage.setItem('csKey', 'GameScene1');
-  
-      // Wait for user interaction
-      this.input.once('pointerdown', () => {
-        this.scene.start('GameScene2');
-      });
-
-
+              nextScreen.call(this); // call with correct "this"
+            } else {
+              document.getElementById("output").innerHTML =
+                `${result.response}`;
+            }
+          }
+        }
+        loginUser.call(this); // preserve scene context
+      }
     });
 
+    //REGISTER BUTTON LISTENER ===
+    regBtn.addEventListener('click', () => {
+      let regEmail = document.getElementById("email-input").value;
+      let regName = document.getElementById("name-reg").value;
+      let pwd = document.getElementById("pwd-reg").value;
+      let wallet = document.getElementById("wallet-reg").value;
+
+      if (regEmail && regName && pwd && wallet) {
+        async function regUser() {
+          const sendApi = await fetch('register.php', {
+            method: "POST",
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+              email: regEmail,
+              name: regName,
+              password: pwd,
+              wallet_address: wallet
+            })
+          });
+
+          const result = await sendApi.json();
+          if (sendApi.ok) {
+            if (result.status === "success") {
+              // store in localStorage
+              localStorage.setItem('userdata', JSON.stringify(result.response));
+
+              nextScreen.call(this);
+            } else {
+              document.getElementById("output").innerHTML =
+                `<font style="color:red;">${result.response}</font>`;
+            }
+          } else {
+            document.getElementById("output").innerHTML =
+              `<font style="color:red;">Oops!! something went wrong</font>`;
+          }
+        }
+
+        regUser.call(this);
+      } else {
+        document.getElementById("output").innerHTML =
+          `<font style="color:red;">All fields are required</font>`;
+      }
+    });
+
+    // HELPER FUNCTION TO MOVE TO NEXT SCENE
+    function nextScreen() {
+      localStorage.setItem('csKey', 'GameScene1');
+      emailInput.style.display ='none';
+      this.scene.start('GameScene2'); //next screen
+    }
   }
 }
+
 
 
 
@@ -193,36 +251,123 @@ class GameScene2 extends Phaser.Scene {
   }
 
   create() {
+    // Check login
+    const userRaw = localStorage.getItem('userdata');
+    if (!userRaw) {
+      localStorage.setItem('csKey', 'GameScene1');
+      document.getElementById("output").style.display = "block";
+      document.getElementById("output").innerHTML = `You need to login first <a href="/bussygame">Login/Register</a>`;
+      return;
+    }
+
     const { width, height } = this.scale;
     localStorage.setItem('csKey', 'GameScene2');
 
-    this.add.text(width / 2, height / 2, `Welcome ${gamerEmail} \n \n`, {
-      font: '48px Arial',
-      fill: '#ffffff'
-    }).setOrigin(0.5);
+    // Parse user data
+    let userData;
+    try {
+      userData = JSON.parse(userRaw);
+    } catch (e) {
+      console.error("Invalid userdata in localStorage");
+      return;
+    }
 
-    // Show the HTML input box
-    const task1 = document.getElementById('divtask1');
-    task1.style.display = 'block';
+    const userEmail = userData.email || "";
+    const userName = userData.name || "";
+    const walletAddress = userData.walletAddress || "";
+    const balance = userData.balance ? userData.balance : 0;
 
-    task1.addEventListener('click', () => {
-      task1.style.display="none";
+    document.getElementById("questions").style.display = "block";
+    document.getElementById('questionaire-user').innerHTML =
+      `<font style="font-size:20px; font-weight:bold;">Welcome ${userName} | Email : ${userEmail} | Wallet : ${walletAddress}</font> | Balance : ${balance}`;
 
-      this.add.text(width / 2, height * 0.5, '\n \n \n Game : Pick atleast 500 Oranges into the basket \n Duration : 1 minute. \n Are you ready ?\n Tap the screen to Play', {
-        font: '48px Arial',
-        fill: '#ffffff'
-      }).setOrigin(0.5);
-      
+    // Load questions
+    async function quest() {
+      try {
+        const api = await fetch('questionaire.php', {
+          method: "POST",
+          headers: { 'Content-Type': 'application/json' }
+        });
 
-      // Wait for user interaction
-      this.input.once('pointerdown', () => {
-        backGroundMusic = this.sound.add('bg-music', { loop: true, volume: 0.5 });
-        this.scene.start('GameScene3');
-      });
-    });
+        const resulti = await api.json();
+        if (api.ok && resulti.status === "success") {
+          let ress = resulti.response;
+          let sn = 1;
+          let dataout = `<div><h3>Pick a Question</h3>`;
+          for (let i = 0; i < ress.length; i++) {
+            dataout += `
+              <div style="height:50px;">
+                <a href="javascript:void(0)" 
+                   style="text-decoration:none; cursor:pointer; color:white;" 
+                   onclick="choseQuest('${ress[i].question}', '${ress[i].optiona}', '${ress[i].optionb}', '${ress[i].answer}')">
+                  ${sn++} --- ${ress[i].question}
+                </a>
+              </div>`;
+          }
+          dataout += `</div>`;
+          document.getElementById("questionaire").innerHTML = dataout;
+        } else {
+          document.getElementById("questionaire").innerHTML = `${resulti.status || "Error loading questions"}`;
+        }
+      } catch (err) {
+        console.error(err);
+        document.getElementById("questionaire").innerHTML = "No questionnaire found";
+      }
+    }
 
+    quest();
   }
 }
+
+// Global functions (because inline onclick calls them)
+function choseQuest(qes, oa, ob, ans) {
+  document.getElementById("questionaire").innerHTML = `
+    <h3>Answer Task/Question</h3>
+    <h4>Task/Question</h4>
+    <p>${qes}</p>
+    <p>Option A : ${oa.toUpperCase()}</p>
+    <p>Option B : ${ob.toUpperCase()}</p>
+    <p>Type your answer in the box below. e.g vitamin c</p>
+    <div style="margin-left:300px;">
+      <input type="text" id="answer_picked" />
+      <p>
+        <button onclick="answerQuest(document.getElementById('answer_picked').value, '${ans}')">Submit</button>
+      </p>
+
+      <h3>OR <br/> Make Payment</h3>
+      <button>Pay 0.1 BNB</button>
+    </div>
+  `;
+}
+
+function answerQuest(answered, ans) {
+  if (answered.toLowerCase() !== ans.toLowerCase()) {
+    document.getElementById("questionaire").innerHTML = `
+      <h3>Wrong Answer</h3>
+      <p>The answer you picked is wrong, hence, you'll need to make payment if you still want to play the game</p>
+      <div style="margin-left:300px;">
+        <button>Pay 0.1 BNB</button>
+      </div>
+    `;
+  } else {
+    document.getElementById("questionaire").innerHTML = `
+      <h3>Correct Answer</h3>
+      <p>You can now play the game.</p>
+      <h2>Game Level 1</h2>
+      <p>Pick 500 Oranges into the basket within 2 minutes</p>
+      <p>If you're able to pick 500 oranges within 2 minutes, you win; otherwise, you lose</p>
+      <p>If you loose, you'll have to relogin and start all over</p>
+      <p>Good Luck</p>
+      <div style="margin-left:300px;">
+        <button onclick="game.scene.start('GameScene3')">Play Game</button>
+      </div>
+    `;
+  }
+}
+
+
+
+
 
 
 
@@ -239,8 +384,11 @@ class GameScene3 extends Phaser.Scene {
       const { width, height } = this.scale;
       localStorage.setItem('csKey', 'GameScene3');
 
+      //clean the screen
+      document.getElementById("questions").style.display = "none";
+
       //Add Background music
-      //backGroundMusic = this.sound.add('bg-music', { loop: true, volume: 0.5 });
+      backGroundMusic = this.sound.add('bg-music', { loop: true, volume: 0.5 });
       backGroundMusic.play();
 
       // Basket (player)
@@ -386,7 +534,8 @@ class LoseScene1 extends Phaser.Scene {
   }
 
   create() {
-    localStorage.setItem('csKey', 'GameScene3');
+    //then take him back to scene1
+    localStorage.setItem('csKey', 'GameScene1');
     //let crrsc = localStorage.getItem('csKey');
     //let lastval = parseInt(crrsc[-1]) + 1;
       const { width, height } = this.scale;
@@ -396,9 +545,12 @@ class LoseScene1 extends Phaser.Scene {
           align: 'center'
       }).setOrigin(0.5);
 
+      //clear storage so that he can restart
+      localStorage.clear();
+
       this.input.once('pointerdown', () => {
           backGroundMusic = this.sound.add('bg-music', { loop: true, volume: 0.5 });
-          this.scene.start('GameScene3');
+          this.scene.start('GameScene1');
       });
   }
 }
@@ -420,17 +572,46 @@ class WinScene1 extends Phaser.Scene {
     //let crrsc = localStorage.getItem('csKey');
     //let lastval = parseInt(crrsc[-1]) + 1;
     //let crrsc[-1] = lastval;
+    //get userdata
+    const userdata = JSON.parse(localStorage.getItem('userdata'));
+    const usermailer = userdata.email;
+    const wallet = userdata.walletAddress;
+    const userbal = userdata.balance ? userdata.balance : 0;
+    const currentBalance = parseFloat(userbal);
+    const newBalance = currentBalance + 0.1;
+
+
+    console.log(userbal + '\n' + currentBalance + '\n' + newBalance);
+
       const { width, height } = this.scale;
-      this.add.text(width / 2, height / 2, `Congratulations, You Win! \n Total Oranges Picked: ${this.finalScore} \n You need to perform another task \n Before moving to the next level \n Tap the screen to continue`, {
+      this.add.text(width / 2, height / 2, `Congratulations, You Win this level! \n Total Oranges Picked: ${this.finalScore} \n You won 0.1 BNB \n Wallet: ${wallet} \n Total Reward: ${newBalance}  \n Now to the next level \n Tap the screen to continue`, {
           fontSize: '48px',
           fill: '#ffff00',
           align: 'center'
       }).setOrigin(0.5);
 
+      //now update his new wallet
+      updateBalance(newBalance, usermailer);
+
+
       this.input.once('pointerdown', () => {
           this.scene.start('GameScene4');
       });
   }
+}
+
+
+async function updateBalance(balance, user) {
+  const api = await fetch('update_balance.php', {
+    method:"POST",
+    headers:{
+      'Content-Type':'application/json'
+    },
+    body:JSON.stringify({
+      email:user,
+      balance:balance
+    })
+  });
 }
 
 
@@ -1327,6 +1508,7 @@ else if(currentScene ==='BootScene' || currentScene ===undefined || currentScene
 }
 
 
-new Phaser.Game(config);
+//new Phaser.Game(config);
+const game = new Phaser.Game(config);
 
 console.log(currentScene);
